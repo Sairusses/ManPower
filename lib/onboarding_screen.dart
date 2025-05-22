@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'mobile/auth/log_in.dart';
 import 'mobile/auth/sign_up/role_selection.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -82,7 +83,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 40),
             child: ElevatedButton(
               onPressed: () {
-                // TODO: Navigate to login
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => Login())
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,

@@ -46,17 +46,14 @@ class AuthService {
   Future<String?> login ({
     required String email,
     required String password,
-    required BuildContext context
   }) async{
     if (email.isEmpty || password.isEmpty) {
       showToast("Email or password cannot be empty");
       return null;
     }
     try {
-      showLoadingDialog(context);
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(email: email, password: password);
       User? user = userCredential.user;
-      if(context.mounted) Navigator.pop(context);
       return user?.uid;
     } on FirebaseAuthException catch (e) {
       showToast(_getFirebaseErrorMessage(e.code));
@@ -66,12 +63,14 @@ class AuthService {
 
   //log out method
   Future<void> logout(BuildContext context) async {
-    showLoadingDialog(context);
     await _auth.signOut();
     if(context.mounted){
-      Navigator.pop(context);
       Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => OnboardingScreen()), (route) => false);
     }
+  }
+  Future<String> getRoleByID(String uid) async {
+    DocumentSnapshot userSnapshot = await _firestore.collection('users').doc(uid).get();
+    return userSnapshot.get('role');
   }
 
   //helper methods

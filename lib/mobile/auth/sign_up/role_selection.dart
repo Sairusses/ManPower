@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:manpower/mobile/auth/sign_up/create_account.dart';
 
+import '../log_in.dart';
+
 class RoleSelection extends StatefulWidget {
   const RoleSelection({super.key});
 
@@ -75,7 +77,9 @@ class _RoleSelectionState extends State<RoleSelection> {
                 const SizedBox(height: 20),
                 TextButton(
                   onPressed: () {
-                    // TODO: Navigate to login screen
+                    Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => Login())
+                    );
                   },
                   child: const Text.rich(
                     TextSpan(

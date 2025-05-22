@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:manpower/mobile/auth/auth_service.dart';
+import 'package:manpower/mobile/auth/log_in.dart';
 import 'package:manpower/mobile/client/home_client.dart';
 import '../../components/custom_text_form_field.dart';
 import '../../freelancer/home_freelancer.dart';
@@ -114,7 +115,9 @@ class _CreateAccountState extends State<CreateAccount> {
             ),
             TextButton(
               onPressed: () {
-                // TODO: Navigate to login screen
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => Login())
+                );
               },
               child: const Text.rich(
                 TextSpan(
@@ -157,7 +160,7 @@ class SignUpHeader extends StatelessWidget{
           ),
         ),
         Center(
-          child: Text('Start managing projects with AI assistance',
+          child: Text('Grow your career with us',
             textAlign: TextAlign.center,
             style: TextStyle(
                 fontSize: 16, fontFamily: 'Inter', fontWeight: FontWeight.normal, color:  Colors.black
