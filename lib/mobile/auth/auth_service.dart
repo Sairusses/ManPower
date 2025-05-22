@@ -68,9 +68,14 @@ class AuthService {
       Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => OnboardingScreen()), (route) => false);
     }
   }
-  Future<String> getRoleByID(String uid) async {
-    DocumentSnapshot userSnapshot = await _firestore.collection('users').doc(uid).get();
-    return userSnapshot.get('role');
+
+  Future<String?> getRoleByID(String uid) async {
+    DocumentSnapshot snapshot = await _firestore.collection('users').doc(uid).get();
+    if(snapshot.exists){
+      return snapshot['role'];
+    }else {
+      return null;
+    }
   }
 
   //helper methods
