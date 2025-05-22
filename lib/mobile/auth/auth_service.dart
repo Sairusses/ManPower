@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
+import 'package:manpower/onboarding_screen.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -12,7 +13,7 @@ class AuthService {
       required String username,
       required String email,
       required String password,
-      required BuildContext context
+      required String role,
     }) async {
     if (username.isEmpty || email.isEmpty || password.isEmpty) {
       showToast("Fields cannot be empty");
@@ -23,18 +24,16 @@ class AuthService {
       return null;
     }
     try{
-      showLoadingDialog(context);
       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
       User? user = userCredential.user;
       if (user != null) {
         await _firestore.collection("users").doc(user.uid).set({
           "username": username,
           "email": email,
-          "role": "",
+          "role": role,
           "createdAt": FieldValue.serverTimestamp(),
         });
       }
-      if(context.mounted) Navigator.pop(context);
       return user?.uid;
     }on FirebaseAuthException catch (e) {
       String errorMessage = _getFirebaseErrorMessage(e.code);
@@ -57,14 +56,21 @@ class AuthService {
       showLoadingDialog(context);
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(email: email, password: password);
       User? user = userCredential.user;
-      if (user != null) {
-        DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection(
-            'users').doc(user.uid).get();
-        String role = userDoc['role'];
-        Navigator.pop(context);
-      }
+      if(context.mounted) Navigator.pop(context);
+      return user?.uid;
     } on FirebaseAuthException catch (e) {
       showToast(_getFirebaseErrorMessage(e.code));
+      return null;
+    }
+  }
+
+  //log out method
+  Future<void> logout(BuildContext context) async {
+    showLoadingDialog(context);
+    await _auth.signOut();
+    if(context.mounted){
+      Navigator.pop(context);
+      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => OnboardingScreen()), (route) => false);
     }
   }
 

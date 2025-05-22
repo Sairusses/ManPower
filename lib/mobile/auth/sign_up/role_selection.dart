@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:manpower/auth/sign_up/create_account.dart';
+import 'package:manpower/mobile/auth/sign_up/create_account.dart';
 
 class RoleSelection extends StatefulWidget {
   const RoleSelection({super.key});
@@ -59,7 +59,7 @@ class _RoleSelectionState extends State<RoleSelection> {
                 const SizedBox(height: 30),
                 ElevatedButton(
                   onPressed: _selectedRole == null ? null : () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => CreateAccount()));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => CreateAccount(role: _selectedRole!)));
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,

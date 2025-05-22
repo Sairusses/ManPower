@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:manpower/auth/sign_up/role_selection.dart';
+
+import 'mobile/auth/sign_up/role_selection.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -13,7 +14,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   int _currentIndex = 0;
 
   final List<Map<String, dynamic>> _pages = [
-    {'icon': Icons.work, 'text': 'Find Work Easily'},
+    {'icon': Icons.business_center_outlined, 'text': 'Find Work Easily'},
     {'icon': Icons.security, 'text': 'Secure & Trusted'},
     {'icon': Icons.monetization_on, 'text': 'Get Paid Fast'},
   ];

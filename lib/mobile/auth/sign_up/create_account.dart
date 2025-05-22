@@ -1,12 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:manpower/mobile/auth/auth_service.dart';
+import 'package:manpower/mobile/client/home_client.dart';
 import '../../components/custom_text_form_field.dart';
+import '../../freelancer/home_freelancer.dart';
 
-class CreateAccount extends StatelessWidget{
-  CreateAccount({super.key});
+class CreateAccount extends StatefulWidget{
+  final String role;
+  const CreateAccount({super.key, required this.role});
+
+  @override
+  State<CreateAccount> createState() => _CreateAccountState();
+}
+
+class _CreateAccountState extends State<CreateAccount> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +58,60 @@ class CreateAccount extends StatelessWidget{
               prefixIcon: Icon(Icons.lock, color: Colors.black,),
               isPassword: true,
             ),
-            SignUpButton(usernameController: usernameController, emailController: emailController, passwordController: passwordController, confirmPasswordController: confirmPasswordController,),
+            SizedBox(
+              height: 45,
+              width: double.infinity,
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator(color: Colors.blue))
+                  : ElevatedButton(
+                onPressed: () async {
+                  if (usernameController.text.isEmpty ||
+                      emailController.text.isEmpty ||
+                      passwordController.text.isEmpty ||
+                      confirmPasswordController.text.isEmpty) {
+                    Fluttertoast.showToast(msg: "Fields cannot be empty");
+                    return;
+                  }
+                  if (passwordController.text != confirmPasswordController.text) {
+                    Fluttertoast.showToast(msg: "Passwords do not match");
+                    return;
+                  }
+
+                  setState(() => isLoading = true);
+
+                  String? userId = await AuthService().signup(
+                    username: usernameController.text.trim(),
+                    email: emailController.text.trim(),
+                    password: passwordController.text.trim(),
+                    role: widget.role,
+                  );
+
+                  setState(() => isLoading = false);
+
+                  if (userId != null && context.mounted) {
+                    if (widget.role == 'client') {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (context) => HomeClient()),
+                            (route) => false,
+                      );
+                    } else if (widget.role == 'freelancer') {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (context) => HomeFreelancer()),
+                            (route) => false,
+                      );
+                    }
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: const Text('Sign Up'),
+              ),
+            ),
             TextButton(
               onPressed: () {
                 // TODO: Navigate to login screen
@@ -69,7 +134,6 @@ class CreateAccount extends StatelessWidget{
       ),
     );
   }
-
 }
 
 class SignUpHeader extends StatelessWidget{
@@ -101,35 +165,6 @@ class SignUpHeader extends StatelessWidget{
           ),
         ),
       ],
-    );
-  }
-}
-
-class SignUpButton extends StatelessWidget{
-  final TextEditingController usernameController;
-  final TextEditingController emailController;
-  final TextEditingController passwordController;
-  final TextEditingController confirmPasswordController;
-  const SignUpButton({super.key, required this.usernameController, required this.emailController, required this.passwordController, required this.confirmPasswordController});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 45,
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: () async{
-          // TODO: Create Account
-        },
-        style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blue,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10)
-            )
-        ),
-        child: Text('Sign Up'),
-      ),
     );
   }
 }
