@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:manpower/mobile/components/custom_text_form_field.dart';
 
@@ -14,19 +16,100 @@ class _CreateProjectState extends State<CreateProject> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  final List<Widget> _pages = const [
-    PageOne(),
-    PageTwo(),
-    PageThree(),
-    PageFour(),
-  ];
+  final TextEditingController titleController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
+  final TextEditingController hourlyRateController = TextEditingController();
+  final TextEditingController fixedPriceController = TextEditingController();
+  List<String> selectedSkills = [];
+  String paymentType = '';
 
-  void _nextPage() {
-    if (_currentPage < _pages.length - 1) {
-      _pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.ease);
-    }else if(_currentPage == _pages.length - 1 ){
-      Navigator.of(context).pop();
-      // TODO: Create project
+  Future<void> _nextPage() async {
+    switch(_currentPage){
+      case 0:
+        if(titleController.text.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Please enter a title')),
+          );
+          return;
+        }else{
+          _pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.ease);
+          break;
+        }
+      case 1:
+        if(selectedSkills.isEmpty){
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Please select at least one skill')),
+          );
+          return;
+        }else{
+          _pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.ease);
+          break;
+        }
+      case 2:
+        if (paymentType == 'fixed') {
+          if (fixedPriceController.text.isEmpty ||
+              double.tryParse(fixedPriceController.text) == null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Please enter a valid fixed price')),
+            );
+            return;
+          }
+        } else if (paymentType == 'hourly') {
+          if (hourlyRateController.text.isEmpty ||
+              double.tryParse(hourlyRateController.text) == null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Please enter a valid hourly rate')),
+            );
+            return;
+          }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Please select a payment type')),
+          );
+          return;
+        }
+        _pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.ease);
+        break;
+      case 3:
+        final uid = FirebaseAuth.instance.currentUser?.uid;
+
+        if (uid == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('User not logged in')),
+          );
+          return;
+        }
+
+        if (descriptionController.text.trim().isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Please enter a project description')),
+          );
+          return;
+        }
+
+        final projectData = {
+          'title': titleController.text.trim(),
+          'description': descriptionController.text.trim(),
+          'skills': selectedSkills,
+          'paymentType': paymentType,
+          'hourlyRate': double.tryParse(hourlyRateController.text.trim()) ?? 0.0,
+          'fixedPrice': double.tryParse(fixedPriceController.text.trim()) ?? 0.0,
+          'createdAt': FieldValue.serverTimestamp(),
+        };
+
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(uid)
+            .collection('projects')
+            .add(projectData);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Project created successfully')),
+        );
+        if (context.mounted) {
+          Navigator.of(context).pop();
+        }
+        break;
     }
   }
 
@@ -37,7 +120,34 @@ class _CreateProjectState extends State<CreateProject> {
   }
 
   @override
+  void dispose() {
+    _pageController.dispose();
+    titleController.dispose();
+    descriptionController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+
+    final List<Widget> pages = [
+      PageOne(titleController: titleController),
+      PageTwo(
+        selectedSkills: selectedSkills,
+        onSkillsChanged: (List<String> value) {
+          selectedSkills = value;
+        }
+      ),
+      PageThree(
+        onPaymentType: (String value) {
+          paymentType = value;
+        },
+        hourlyRateController: hourlyRateController,
+        fixedPriceController: fixedPriceController,
+      ),
+      PageFour(descriptionController: descriptionController,),
+    ];
+
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
@@ -53,31 +163,30 @@ class _CreateProjectState extends State<CreateProject> {
       ),
       body: PageView.builder(
         controller: _pageController,
-        itemCount: _pages.length,
+        itemCount: pages.length,
         onPageChanged: (index) => setState(() => _currentPage = index),
-        itemBuilder: (context, index) => _pages[index],
+        itemBuilder: (context, index) => pages[index],
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            if (_currentPage > 0)
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
-                ),
-                onPressed: _prevPage,
-                child: const Text('Back')
+            ElevatedButton(
+              onPressed: _currentPage > 0 ? _prevPage : null, // Disable when on first page
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _currentPage > 0 ? Colors.blue : Colors.grey[300],
+                foregroundColor: _currentPage > 0 ? Colors.white : Colors.grey[600],
               ),
+              child: const Text('Back'),
+            ),
             ElevatedButton(
               onPressed: _nextPage,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
                 foregroundColor: Colors.white,
               ),
-              child: Text(_currentPage == _pages.length - 1 ? 'Finish' : 'Next'),
+              child: Text(_currentPage == pages.length - 1 ? 'Finish' : 'Next'),
             ),
           ],
         ),
@@ -87,7 +196,8 @@ class _CreateProjectState extends State<CreateProject> {
 }
 
 class PageOne extends StatelessWidget {
-  const PageOne({super.key});
+  final TextEditingController titleController;
+  const PageOne({super.key, required this.titleController});
 
   @override
   Widget build(BuildContext context) {
@@ -100,8 +210,9 @@ class PageOne extends StatelessWidget {
           const SizedBox(height: 12),
           const Text("A clear title helps attract the right talent."),
           const SizedBox(height: 12),
-          const TextField(
-            decoration: InputDecoration(
+          TextField(
+            controller: titleController,
+            decoration: const InputDecoration(
               labelText: 'Project Title',
               border: OutlineInputBorder(),
               focusColor: Colors.blue
@@ -116,7 +227,9 @@ class PageOne extends StatelessWidget {
 }
 
 class PageTwo extends StatefulWidget {
-  const PageTwo({super.key});
+  final List<String> selectedSkills;
+  final ValueChanged<List<String>> onSkillsChanged;
+  const PageTwo({super.key, required this.selectedSkills, required this.onSkillsChanged});
 
   @override
   State<PageTwo> createState() => _PageTwoState();
@@ -128,6 +241,7 @@ class _PageTwoState extends State<PageTwo> {
   void _toggleSkill(Skill skill) {
     setState(() {
       skill.isSelected = !skill.isSelected;
+      widget.onSkillsChanged(skillList.where((skill) => skill.isSelected).map((skill) => skill.name).toList());
     });
   }
 
@@ -187,7 +301,10 @@ class _PageTwoState extends State<PageTwo> {
 }
 
 class PageThree extends StatefulWidget {
-  const PageThree({super.key});
+  final ValueChanged<String> onPaymentType;
+  final TextEditingController hourlyRateController;
+  final TextEditingController fixedPriceController;
+  const PageThree({super.key, required this.hourlyRateController, required this.fixedPriceController, required this.onPaymentType});
 
   @override
   State<PageThree> createState() => _PageThreeState();
@@ -199,12 +316,13 @@ class _PageThreeState extends State<PageThree> {
   void _selectOption(String option) {
     setState(() {
       _selectedOption = option;
+      widget.onPaymentType(_selectedOption = option);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -266,7 +384,7 @@ class _PageThreeState extends State<PageThree> {
             const Text("Set your hourly rate", style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             CustomTextFormField(
-              controller: TextEditingController(),
+              controller: widget.hourlyRateController,
               labelText: 'Hourly Rate (USD)',
               hint: 'Add a hourly rate',
               textInputType: TextInputType.number,
@@ -278,21 +396,12 @@ class _PageThreeState extends State<PageThree> {
             const Text("Set a fixed price for the whole project", style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             CustomTextFormField(
-              controller: TextEditingController(),
+              controller: widget.fixedPriceController,
               labelText: 'Fixed Price (USD)',
               hint: 'Add a fixed price',
               textInputType: TextInputType.number,
               prefixIcon: Icon(Icons.attach_money),
             ),
-            const SizedBox(height: 12),
-            CustomTextFormField(
-              controller: TextEditingController(),
-              labelText: 'Description',
-              hint: 'Describe the scope or deliverables',
-              maxLines: 5,
-              prefixIcon: null,
-              suffixIcon: null,
-            )
           ],
         ],
       ),
@@ -300,9 +409,9 @@ class _PageThreeState extends State<PageThree> {
   }
 }
 
-
 class PageFour extends StatelessWidget {
-  const PageFour({super.key});
+  final TextEditingController descriptionController;
+  const PageFour({super.key, required this.descriptionController});
 
   @override
   Widget build(BuildContext context) {
@@ -320,7 +429,7 @@ class PageFour extends StatelessWidget {
           const Text("• Are there any deadlines or specific milestones?"),
           const SizedBox(height: 16),
           CustomTextFormField(
-            controller: TextEditingController(),
+            controller: descriptionController,
             labelText: 'Description',
             hint: 'Project description',
             maxLines: 5,
