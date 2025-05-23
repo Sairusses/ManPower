@@ -211,11 +211,13 @@ class PageOne extends StatelessWidget {
           const Text("A clear title helps attract the right talent."),
           const SizedBox(height: 12),
           TextField(
+            cursorColor: Colors.blue,
             controller: titleController,
             decoration: const InputDecoration(
               labelText: 'Project Title',
-              border: OutlineInputBorder(),
-              focusColor: Colors.blue
+              labelStyle: TextStyle(color: Colors.black),
+              border: OutlineInputBorder(borderSide: BorderSide(color: Colors.black54)),
+              focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
             ),
           ),
           const SizedBox(height: 20),

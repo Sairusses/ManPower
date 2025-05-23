@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Talents extends StatefulWidget {
@@ -31,17 +32,18 @@ class _TalentsState extends State<Talents> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: TextField(
+              cursorColor: Colors.blue,
               controller: _searchController,
               onChanged: (value) => setState(() => searchQuery = value.trim().toLowerCase()),
               decoration: InputDecoration(
                 hintText: 'Search freelancers by name, skill, or title',
-                prefixIcon: const Icon(Icons.search),
+                hintStyle: TextStyle(fontSize: 14),
+                suffixIcon: Icon(CupertinoIcons.search, color: Colors.black,),
                 filled: true,
                 fillColor: Colors.white,
-                contentPadding: const EdgeInsets.symmetric(vertical: 16),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: const BorderSide(color: Colors.blue),
+                  borderSide: const BorderSide(color: Colors.black),
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
@@ -74,10 +76,8 @@ class _TalentsState extends State<Talents> {
                   return const Center(child: Text("No freelancers found."));
                 }
 
-                return ListView.separated(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                return ListView.builder(
                   itemCount: filteredFreelancers.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final data = filteredFreelancers[index].data() as Map<String, dynamic>;
                     final name = data['username']?.toString().trim().isNotEmpty == true
@@ -115,7 +115,7 @@ class _TalentsState extends State<Talents> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(0),
         border: Border.all(color: Colors.grey, width: .5),
       ),
       padding: const EdgeInsets.all(16),

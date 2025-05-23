@@ -24,51 +24,51 @@ class Projects extends StatelessWidget {
         ),
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance.collection('users').doc(user!.uid).collection('projects').snapshots(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator(color: Colors.blue,));
-              }
+        child: StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance.collection('users').doc(user!.uid).collection('projects').snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator(color: Colors.blue,));
+            }
 
-              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                return Column(
-                  children: [
-                    const SizedBox(height: 100),
-                    Center(
-                      child: Column(
-                        children: [
-                          Icon(Icons.folder_open, size: 60, color: Colors.grey[400]),
-                          const SizedBox(height: 16),
-                          const Text(
-                            "No projects yet.",
-                            style: TextStyle(fontSize: 16, color: Colors.grey),
-                          ),
-                        ],
-                      ),
+            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+              return Column(
+                children: [
+                  const SizedBox(height: 100),
+                  Center(
+                    child: Column(
+                      children: [
+                        Icon(Icons.folder_open, size: 60, color: Colors.grey[400]),
+                        const SizedBox(height: 16),
+                        const Text(
+                          "No projects yet.",
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                        ),
+                      ],
                     ),
-                  ],
-                );
-              }
-
-              final projects = snapshot.data!.docs;
-
-              return ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: projects.length,
-                itemBuilder: (context, index) {
-                  final project = projects[index];
-                  return ProjectCard(
-                    title: project['title'] ?? 'Untitled',
-                    description: project['description'] ?? 'No description.',
-                  );
-                },
+                  ),
+                ],
               );
-            },
-          ),
+            }
+
+            final projects = snapshot.data!.docs;
+
+            return ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: projects.length,
+              itemBuilder: (context, index) {
+                final project = projects[index];
+                return ProjectCard(
+                  title: project['title'] ?? 'Untitled',
+                  description: project['description'] ?? 'No description.',
+                  paymentType: project['paymentType'] ?? 'Unknown',
+                  hourlyRate: project['hourlyRate']?.toDouble() ?? 0.0,
+                  fixedPrice: project['fixedPrice']?.toDouble() ?? 0.0,
+                );
+              },
+            );
+          },
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -88,30 +88,104 @@ class Projects extends StatelessWidget {
 class ProjectCard extends StatelessWidget {
   final String title;
   final String description;
+  final String paymentType;
+  final double hourlyRate;
+  final double fixedPrice;
 
   const ProjectCard({
     super.key,
     required this.title,
     required this.description,
+    required this.paymentType,
+    required this.hourlyRate,
+    required this.fixedPrice,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 3,
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    String paymentInfo;
+    if (paymentType.toLowerCase() == 'hourly') {
+      paymentInfo = 'Hourly Rate -- Estimated Budget \$${hourlyRate.toStringAsFixed(0)} / hr';
+    } else if (paymentType.toLowerCase() == 'fixed') {
+      paymentInfo = 'Fixed Price -- Estimated Budget \$${fixedPrice.toStringAsFixed(0)}';
+    } else {
+      paymentInfo = 'Payment: Unknown';
+    }
+
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.grey, width: .5),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            // Header Row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.more_vert, color: Colors.grey),
+                  onPressed: () {
+                    // TODO: Add options like edit/delete
+                  },
+                ),
+              ],
             ),
+
             const SizedBox(height: 8),
-            Text(description,
-              style: const TextStyle(fontSize: 14, color: Colors.black54),
+
+            // Description
+            Text(
+              description,
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.black87,
+                height: 1.4,
+              ),
+              maxLines: 4,
+              overflow: TextOverflow.ellipsis,
+            ),
+
+            const SizedBox(height: 12),
+
+            // Payment info line
+            Row(
+              children: [
+                const Icon(Icons.attach_money, size: 16, color: Colors.grey),
+                const SizedBox(width: 4),
+                Text(
+                  paymentInfo,
+                  style: const TextStyle(fontSize: 14, color: Colors.black87),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
+            // Footer Line (optional)
+            Row(
+              children: const [
+                Icon(Icons.calendar_today_outlined, size: 14, color: Colors.grey),
+                SizedBox(width: 4),
+                Text(
+                  "Created recently",
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                )
+              ],
             ),
           ],
         ),
@@ -119,3 +193,4 @@ class ProjectCard extends StatelessWidget {
     );
   }
 }
+
