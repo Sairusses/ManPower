@@ -207,13 +207,13 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
                 ),
 
                 SizedBox(
-                  height: 60,
+                  height: 70,
                   child: ListView(
                     scrollDirection: Axis.horizontal,
                     children: const [
-                      ApplicantCard(name: 'Daisy Schoen', location: 'Florence, SC'),
+                      ApplicantCard(name: 'Sample 1', location: 'Sangandaan, Caloocan'),
                       SizedBox(width: 10),
-                      ApplicantCard(name: 'Ronald Ross', location: 'Oxford, UK'),
+                      ApplicantCard(name: 'Sample 2', location: 'Meycauayan, Bulacan'),
                     ],
                   ),
                 ),
@@ -239,14 +239,18 @@ class ApplicantCard extends StatelessWidget {
       width: 220,
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: Colors.grey,
+          width: .5,
+        ),
       ),
       child: Row(
         children: [
           const CircleAvatar(
             radius: 20,
-            backgroundColor: Colors.pinkAccent,
+            backgroundColor: Colors.blue,
             child: Icon(Icons.person, color: Colors.white),
           ),
           const SizedBox(width: 10),
