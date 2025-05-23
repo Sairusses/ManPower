@@ -1,12 +1,12 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:manpower/mobile/client/profile_client.dart';
-import 'package:manpower/mobile/client/projects/projects.dart';
 
+//Pages
 import '../components/messages.dart';
 import 'dashboard.dart';
 import 'talents.dart';
+import 'profile.dart';
+import 'package:manpower/mobile/client/projects/projects.dart';
 
 class HomeClient extends StatefulWidget {
   const HomeClient({super.key});
@@ -95,7 +95,7 @@ class HomeClientState extends State<HomeClient> {
           Projects(),
           Talents(),
           Messages(),
-          ProfileClient(),
+          Profile(),
         ],
       ),
     );

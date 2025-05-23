@@ -4,14 +4,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:manpower/mobile/auth/auth_service.dart';
 
-class ProfileClient extends StatefulWidget {
-  const ProfileClient({super.key});
+class Profile extends StatefulWidget {
+  const Profile({super.key});
 
   @override
-  State<ProfileClient> createState() => _ProfileClientState();
+  State<Profile> createState() => _ProfileState();
 }
 
-class _ProfileClientState extends State<ProfileClient> with AutomaticKeepAliveClientMixin{
+class _ProfileState extends State<Profile> with AutomaticKeepAliveClientMixin{
   final User? user = FirebaseAuth.instance.currentUser;
   bool isLoading = false;
 
