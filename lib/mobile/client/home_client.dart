@@ -1,7 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:manpower/mobile/client/profile_client.dart';
-import 'package:manpower/mobile/client/projects.dart';
+import 'package:manpower/mobile/client/projects/projects.dart';
 
 import '../components/messages.dart';
 import 'dashboard.dart';
@@ -51,33 +52,35 @@ class HomeClientState extends State<HomeClient> {
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: NavigationBar(
+        indicatorColor: Colors.transparent,
+        backgroundColor: Colors.grey[50],
         animationDuration: const Duration(milliseconds: 700),
         onDestinationSelected: onDestinationSelected,
         height: MediaQuery.of(context).size.height * 0.1,
         selectedIndex: currentPageIndex,
         destinations: const <Widget>[
           NavigationDestination(
-            selectedIcon: Icon(Icons.home),
+            selectedIcon: Icon(Icons.home, color: Colors.blue,),
             icon: Icon(Icons.home_outlined),
             label: 'Dashboard',
           ),
           NavigationDestination(
-            selectedIcon: Icon(Icons.business_center),
+            selectedIcon: Icon(Icons.business_center, color: Colors.blue),
             icon: Icon(Icons.business_center_outlined),
             label: 'Projects',
           ),
           NavigationDestination(
-            selectedIcon: Icon(CupertinoIcons.search_circle_fill),
+            selectedIcon: Icon(CupertinoIcons.search_circle_fill, color: Colors.blue),
             icon: Icon(CupertinoIcons.search_circle),
-            label: 'Library',
+            label: 'Talents',
           ),
           NavigationDestination(
-            selectedIcon: Icon(CupertinoIcons.chat_bubble_fill),
+            selectedIcon: Icon(CupertinoIcons.chat_bubble_fill, color: Colors.blue),
             icon: Icon(CupertinoIcons.chat_bubble),
             label: 'Messages',
           ),
           NavigationDestination(
-            selectedIcon: Icon(Icons.person),
+            selectedIcon: Icon(Icons.person, color: Colors.blue),
             icon: Icon(Icons.person_outline),
             label: 'Profile',
           ),
