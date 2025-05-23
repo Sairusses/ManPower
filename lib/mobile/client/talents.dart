@@ -27,7 +27,7 @@ class _TalentsState extends State<Talents> {
       ),
       body: Column(
         children: [
-          // 🔍 Search Bar
+
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: TextField(
@@ -48,7 +48,6 @@ class _TalentsState extends State<Talents> {
             ),
           ),
 
-          // 👥 Freelancers List
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
@@ -81,8 +80,6 @@ class _TalentsState extends State<Talents> {
                   separatorBuilder: (_, __) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final data = filteredFreelancers[index].data() as Map<String, dynamic>;
-
-                    // ⛑ Use placeholders to prevent null errors
                     final name = data['username']?.toString().trim().isNotEmpty == true
                         ? data['username']
                         : 'Unnamed Freelancer';
@@ -108,7 +105,6 @@ class _TalentsState extends State<Talents> {
     );
   }
 
-  /// 🎨 Freelancer Card Widget
   Widget _buildFreelancerCard({
     required String name,
     required String title,
@@ -120,14 +116,12 @@ class _TalentsState extends State<Talents> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade300),
-        boxShadow: [BoxShadow(color: Colors.grey.shade200, blurRadius: 6, offset: const Offset(0, 2))],
+        border: Border.all(color: Colors.grey, width: .5),
       ),
       padding: const EdgeInsets.all(16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 👤 Avatar Placeholder
           const CircleAvatar(
             radius: 28,
             backgroundColor: Colors.blue,
@@ -135,7 +129,6 @@ class _TalentsState extends State<Talents> {
           ),
           const SizedBox(width: 16),
 
-          // 📋 Freelancer Info
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -152,7 +145,6 @@ class _TalentsState extends State<Talents> {
                 ),
                 const SizedBox(height: 12),
 
-                // 💰 Rate & 📍 Location
                 Wrap(
                   spacing: 16,
                   children: [
