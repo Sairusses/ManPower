@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../components/messages.dart';
 import 'jobs.dart';
 import 'contracts.dart';
-import 'profile.dart';
+import 'profile/profile.dart';
 import 'proposals.dart';
 
 class HomeFreelancer extends StatefulWidget {

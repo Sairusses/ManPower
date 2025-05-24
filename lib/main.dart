@@ -4,8 +4,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:manpower/onboarding_screen.dart';
+import 'package:manpower/secrets.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'firebase_options.dart';
+
+//gitignore
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,6 +18,10 @@ Future<void> main() async {
   );
   FirebaseFirestore.instance.settings = const Settings(
       persistenceEnabled: true
+  );
+  await Supabase.initialize(
+    url: supabaseUrl,
+    anonKey: supabaseKey,
   );
   if(kIsWeb){
     runApp(

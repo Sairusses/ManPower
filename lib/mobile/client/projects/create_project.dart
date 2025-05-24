@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:manpower/mobile/components/custom_text_form_field.dart';
@@ -443,26 +444,6 @@ class PageFour extends StatelessWidget {
             suffixIcon: null,
           ),
           const SizedBox(height: 16),
-
-          // File Upload Placeholder Button
-          Center(
-            child: OutlinedButton.icon(
-              onPressed: () {
-                // Placeholder: Implement file picker logic later
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Upload document button pressed')),
-                );
-              },
-              icon: const Icon(Icons.upload_file, color: Colors.black),
-              label: const Text(
-                "Upload Supporting Document",
-                style: TextStyle(color: Colors.black),
-              ),
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Colors.black),
-              ),
-            ),
-          )
 
         ],
       ),
