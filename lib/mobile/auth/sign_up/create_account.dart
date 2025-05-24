@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:manpower/mobile/auth/auth_service.dart';
 import 'package:manpower/mobile/auth/log_in.dart';
 import 'package:manpower/mobile/client/home_client.dart';
@@ -70,11 +69,15 @@ class _CreateAccountState extends State<CreateAccount> {
                       emailController.text.isEmpty ||
                       passwordController.text.isEmpty ||
                       confirmPasswordController.text.isEmpty) {
-                    Fluttertoast.showToast(msg: "Fields cannot be empty");
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Fields cannot be empty'))
+                    );
                     return;
                   }
                   if (passwordController.text != confirmPasswordController.text) {
-                    Fluttertoast.showToast(msg: "Passwords do not match");
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Passwords do not match'))
+                    );
                     return;
                   }
 
