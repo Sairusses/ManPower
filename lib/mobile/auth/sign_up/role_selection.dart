@@ -22,6 +22,7 @@ class _RoleSelectionState extends State<RoleSelection> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -115,6 +116,7 @@ class _RoleSelectionState extends State<RoleSelection> {
           height: MediaQuery.of(context).size.height * .3,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
+            color: Colors.white,
             border: Border.all(
               color: isSelected ? Colors.blue : Colors.grey,
               width: isSelected ? 2 : 1,

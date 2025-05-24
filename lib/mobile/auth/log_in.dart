@@ -19,8 +19,8 @@ class _LoginState extends State<Login> {
   bool isLoading = false;
   @override
   Widget build(BuildContext context) {
-    emailController.text = 'user1@user1.com';
-    passwordController.text = 'user1@user1.com';
+    // emailController.text = 'user1@user1.com';
+    // passwordController.text = 'user1@user1.com';
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.grey[50],
@@ -73,7 +73,10 @@ class _LoginState extends State<Login> {
               : ElevatedButton(
                 onPressed: () async{
                   setState(() => isLoading = true);
-                  String? uid = await AuthService().login(email: emailController.text, password: passwordController.text);
+                  String? uid = await AuthService().login(email: emailController.text, password: passwordController.text, context: context);
+                  if(uid == null){
+                    setState(() => isLoading = false);
+                  }
                   if(uid != null){
                     String? role = await AuthService().getRoleByID(uid);
                     if(role == null){

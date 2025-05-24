@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
 import 'package:manpower/onboarding_screen.dart';
 
@@ -14,13 +13,14 @@ class AuthService {
       required String email,
       required String password,
       required String role,
+      required BuildContext context
     }) async {
     if (username.isEmpty || email.isEmpty || password.isEmpty) {
-      showToast("Fields cannot be empty");
+      showToast("Fields cannot be empty", context);
       return null;
     }
     if (!RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}").hasMatch(email)) {
-      showToast("Invalid email format");
+      showToast("Invalid email format", context);
       return null;
     }
     try{
@@ -37,7 +37,7 @@ class AuthService {
       return user?.uid;
     }on FirebaseAuthException catch (e) {
       String errorMessage = _getFirebaseErrorMessage(e.code);
-      showToast(errorMessage);
+      showToast(errorMessage, context);
       return null;
     }
   }
@@ -46,9 +46,10 @@ class AuthService {
   Future<String?> login ({
     required String email,
     required String password,
+    required BuildContext context
   }) async{
     if (email.isEmpty || password.isEmpty) {
-      showToast("Email or password cannot be empty");
+      showToast("Email or password cannot be empty", context);
       return null;
     }
     try {
@@ -56,7 +57,7 @@ class AuthService {
       User? user = userCredential.user;
       return user?.uid;
     } on FirebaseAuthException catch (e) {
-      showToast(_getFirebaseErrorMessage(e.code));
+      showToast(_getFirebaseErrorMessage(e.code), context);
       return null;
     }
   }
@@ -79,14 +80,9 @@ class AuthService {
   }
 
   //helper methods
-  Future<void> showToast(String message, {Color backgroundColor = Colors.transparent}) async {
-    Fluttertoast.showToast(
-      msg: message,
-      toastLength: Toast.LENGTH_LONG,
-      backgroundColor: backgroundColor,
-      textColor: Colors.black,
-      fontSize: 14,
-      gravity: ToastGravity.SNACKBAR,
+  void showToast(String message, BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message))
     );
   }
   void showLoadingDialog(BuildContext context) {

@@ -85,6 +85,7 @@ class _CreateAccountState extends State<CreateAccount> {
                     email: emailController.text.trim(),
                     password: passwordController.text.trim(),
                     role: widget.role,
+                    context: context
                   );
 
                   setState(() => isLoading = false);
