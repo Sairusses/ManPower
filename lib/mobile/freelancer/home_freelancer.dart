@@ -65,14 +65,14 @@ class HomeFreelancerState extends State<HomeFreelancer> {
             label: 'Jobs',
           ),
           NavigationDestination(
-            selectedIcon: Icon(Icons.business_center, color: Colors.blue),
-            icon: Icon(Icons.business_center_outlined),
-            label: 'Projects',
+            selectedIcon: Icon(Icons.edit_document, color: Colors.blue),
+            icon: Icon(Icons.edit_document),
+            label: 'Proposals',
           ),
           NavigationDestination(
-            selectedIcon: Icon(CupertinoIcons.search_circle_fill, color: Colors.blue),
-            icon: Icon(CupertinoIcons.search_circle),
-            label: 'Talents',
+            selectedIcon: Icon(CupertinoIcons.doc_append, color: Colors.blue),
+            icon: Icon(CupertinoIcons.doc_append),
+            label: 'Contracts',
           ),
           NavigationDestination(
             selectedIcon: Icon(CupertinoIcons.chat_bubble_fill, color: Colors.blue),

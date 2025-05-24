@@ -19,8 +19,8 @@ class _LoginState extends State<Login> {
   bool isLoading = false;
   @override
   Widget build(BuildContext context) {
-    emailController.text = 'client1@client1.com';
-    passwordController.text = 'client1@client1.com';
+    emailController.text = 'user1@user1.com';
+    passwordController.text = 'user1@user1.com';
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.grey[50],
