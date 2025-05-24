@@ -88,6 +88,7 @@ class _CreateProjectState extends State<CreateProject> {
         }
 
         final projectData = {
+          'client': uid,
           'title': titleController.text.trim(),
           'description': descriptionController.text.trim(),
           'skills': selectedSkills,
@@ -101,6 +102,9 @@ class _CreateProjectState extends State<CreateProject> {
             .collection('users')
             .doc(uid)
             .collection('projects')
+            .add(projectData);
+        await FirebaseFirestore.instance
+            .collection('jobs')
             .add(projectData);
 
         ScaffoldMessenger.of(context).showSnackBar(
