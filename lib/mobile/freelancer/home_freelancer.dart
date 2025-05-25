@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 
 // Pages
 import '../components/messages.dart';
-import 'jobs.dart';
+import 'jobs/jobs.dart';
 import 'contracts.dart';
 import 'profile/profile.dart';
-import 'proposals.dart';
+import 'proposals/proposals.dart';
 
 class HomeFreelancer extends StatefulWidget {
   const HomeFreelancer({super.key});

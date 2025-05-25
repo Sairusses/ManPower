@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:manpower/mobile/freelancer/jobs/view_job.dart';
 import 'package:manpower/mobile/freelancer/profile/pick_skills.dart';
 
 class Jobs extends StatefulWidget {
@@ -222,71 +223,76 @@ class _JobsState extends State<Jobs> with SingleTickerProviderStateMixin {
     final List<dynamic> skills = data?['skills'] ?? [];
     final String location = data?['location']?.toString().trim() ?? 'Unknown';
 
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            description,
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: Colors.black87),
-          ),
-          const SizedBox(height: 12),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: skills.isNotEmpty
-                  ? skills.map((skill) {
-                return Container(
-                  margin: const EdgeInsets.only(right: 6),
-                  child: Chip(
-                    label: Text(skill.toString()),
-                    backgroundColor: Colors.grey[200],
+    return GestureDetector(
+      onTap: (){
+        Navigator.push(context, MaterialPageRoute(builder: (context) => ViewJob(jobId: job.id)));
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.grey),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              description,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: Colors.black87),
+            ),
+            const SizedBox(height: 12),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: skills.isNotEmpty
+                    ? skills.map((skill) {
+                  return Container(
+                    margin: const EdgeInsets.only(right: 6),
+                    child: Chip(
+                      label: Text(skill.toString()),
+                      backgroundColor: Colors.grey[200],
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  );
+                }).toList()
+                    : [
+                  Chip(
+                    label: const Text('No skills listed'),
+                    backgroundColor: Colors.grey,
                     shape: RoundedRectangleBorder(
                       side: BorderSide(color: Colors.grey),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                  ),
-                );
-              }).toList()
-                  : [
-                Chip(
-                  label: const Text('No skills listed'),
-                  backgroundColor: Colors.grey,
-                  shape: RoundedRectangleBorder(
-                    side: BorderSide(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                )
-              ],
+                  )
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              const Icon(Icons.verified, color: Colors.green, size: 16),
-              const SizedBox(width: 4),
-              const Text("Payment verified", style: TextStyle(fontSize: 12)),
-              const Spacer(),
-              const Icon(Icons.location_on, size: 16),
-              const SizedBox(width: 4),
-              Text(location, style: const TextStyle(fontSize: 12)),
-            ],
-          )
-        ],
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const Icon(Icons.verified, color: Colors.green, size: 16),
+                const SizedBox(width: 4),
+                const Text("Payment verified", style: TextStyle(fontSize: 12)),
+                const Spacer(),
+                const Icon(Icons.location_on, size: 16),
+                const SizedBox(width: 4),
+                Text(location, style: const TextStyle(fontSize: 12)),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
