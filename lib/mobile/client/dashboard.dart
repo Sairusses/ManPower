@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:pushy_flutter/pushy_flutter.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -23,7 +22,6 @@ class _DashboardState extends State<Dashboard> {
   void initState() {
     super.initState();
     _fetchUserData();
-    registerPushyToken();
   }
 
   Future<Map<String, dynamic>> _fetchUserData() async {
@@ -50,20 +48,7 @@ class _DashboardState extends State<Dashboard> {
     };
   }
 
-  Future<void> registerPushyToken() async {
-    try {
-      User? user = FirebaseAuth.instance.currentUser;
-      String token = await Pushy.register();
-      print('Pushy device token: $token');
 
-      // Save to Firestore
-      await FirebaseFirestore.instance.collection('users').doc(user!.uid).update({
-        'pushyToken': token,
-      });
-    } catch (e) {
-      print('Pushy registration failed: $e');
-    }
-  }
 
   Widget _buildLegendItem({required Color color, required String label}) {
     return Row(
