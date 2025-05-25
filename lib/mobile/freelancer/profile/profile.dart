@@ -9,6 +9,8 @@ import 'package:supabase_flutter/supabase_flutter.dart' as sb;
 import 'dart:io' as io;
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:path_provider/path_provider.dart';
+import 'package:open_filex/open_filex.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -125,7 +127,9 @@ class _ProfileState extends State<Profile> with AutomaticKeepAliveClientMixin {
               top: 0,
               right: 0,
               child: IconButton(
-                onPressed: (){},
+                onPressed: (){
+                  // TODO Edit name and email
+                },
                 icon: Icon(CupertinoIcons.pencil_circle, color: Colors.blue, size: 30),
               )
           )
@@ -160,7 +164,13 @@ class _ProfileState extends State<Profile> with AutomaticKeepAliveClientMixin {
                     children: [
                       ElevatedButton.icon(
                         onPressed: () async {
-                          await sb.Supabase.instance.client.storage.from('files').download(fileKey);
+                          final Uint8List fileBytes = await sb.Supabase.instance.client.storage.from('files').download(fileKey);
+                          final tempDir = await getTemporaryDirectory();
+                          final filePath = '${tempDir.path}/$resumeName';
+                          final file = io.File(filePath);
+                          await file.writeAsBytes(fileBytes);
+                          final result = await OpenFilex.open(filePath);
+                          debugPrint('File open result: ${result.message}');
                         },
                         style: ElevatedButton.styleFrom(
                           minimumSize: Size(MediaQuery.of(context).size.width * .7, 40),
@@ -179,8 +189,11 @@ class _ProfileState extends State<Profile> with AutomaticKeepAliveClientMixin {
                             'resume_url': '',
                             'resume_fileKey': '',
                           });
-                          final result = await sb.Supabase.instance.client.storage.from('files').remove([fileKey, resumeName]);
+                          await sb.Supabase.instance.client.storage.from('files').remove([fileKey, resumeName]);
                           if(context.mounted){
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('File successfully deleted'))
+                            );
                           }
                         },
                         icon: Icon(Icons.close, color: Colors.grey)
@@ -248,7 +261,7 @@ class _ProfileState extends State<Profile> with AutomaticKeepAliveClientMixin {
             child: IconButton(
               icon: const Icon(CupertinoIcons.pencil_circle, size: 30, color: Colors.blue,),
               onPressed: () {
-                // Edit logic here
+                // TODO Edit logic here
               },
             ),
           ),
@@ -288,6 +301,7 @@ class _ProfileState extends State<Profile> with AutomaticKeepAliveClientMixin {
                   context, 
                   MaterialPageRoute(builder: (context) => PickSkills())
                 );
+                // TODO update main screen
               }, 
               icon: Icon(CupertinoIcons.pencil_circle, color: Colors.blue, size: 30,)
             ),
