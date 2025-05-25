@@ -6,7 +6,6 @@ import 'package:manpower/mobile/client/home_client.dart';
 import '../components/custom_text_form_field.dart';
 import '../freelancer/home_freelancer.dart';
 import 'auth_service.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 
 class Login extends StatefulWidget{
   const Login({super.key});
@@ -20,14 +19,6 @@ class _LoginState extends State<Login> {
   final TextEditingController passwordController = TextEditingController();
   bool isLoading = false;
 
-  void saveUserFcmToken(String uid) async {
-    final fcmToken = await FirebaseMessaging.instance.getToken();
-    if (fcmToken != null) {
-      await FirebaseFirestore.instance.collection('users').doc(uid).update({
-        'fcmToken': fcmToken,
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +81,6 @@ class _LoginState extends State<Login> {
                     setState(() => isLoading = false);
                   }
                   if(uid != null){
-                    saveUserFcmToken(uid);
                     String? role = await AuthService().getRoleByID(uid);
                     if(role == null){
                       setState(() => isLoading = false);
