@@ -109,6 +109,7 @@ class _ApplyProposalState extends State<ApplyProposal> {
       // Get job title
       final jobDoc = await FirebaseFirestore.instance.collection('jobs').doc(widget.jobId).get();
       final jobTitle = jobDoc['title'] ?? 'Untitled';
+      final jobClient = jobDoc['client'];
 
       // Get applicant name
       final userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
@@ -131,6 +132,12 @@ class _ApplyProposalState extends State<ApplyProposal> {
           .collection('users')
           .doc(uid)
           .collection('proposals')
+          .add(proposal);
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(jobClient)
+          .collection('candidates')
           .add(proposal);
 
       await FirebaseFirestore.instance

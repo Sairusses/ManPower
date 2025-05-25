@@ -10,10 +10,45 @@ class Dashboard extends StatefulWidget {
   State<Dashboard> createState() => _DashboardState();
 }
 
-class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixin {
+class _DashboardState extends State<Dashboard> {
+  String activeProjectsValue = '0';
+  String employeesValue = '0';
+  String candidatesValue = '0';
+  String spentValue = '0';
+  String username = 'Loading username...';
+  List<Map<String, dynamic>> applicantsList = [];
 
   @override
-  bool get wantKeepAlive => true;
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  Future<Map<String, dynamic>> _fetchUserData() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) return {};
+
+    final uid = user.uid;
+    //username
+    final userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    final username = userDoc['username'] ?? 'No Name';
+    //projects count
+    final projectsSnapshot = await FirebaseFirestore.instance
+        .collection('users').doc(uid).collection('projects').get();
+    final activeProjectsValue = projectsSnapshot.docs.length.toString();
+    //candidates count
+    final candidatesSnapshot = await FirebaseFirestore.instance
+        .collection('users').doc(uid).collection('candidates').get();
+    final candidatesValue = candidatesSnapshot.docs.length.toString();
+
+    return {
+      'username': username,
+      'activeProjectsValue': activeProjectsValue,
+      'candidatesValue': candidatesValue,
+    };
+  }
+
+
 
   Widget _buildLegendItem({required Color color, required String label}) {
     return Row(
@@ -31,24 +66,6 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
-    final User? user = FirebaseAuth.instance.currentUser;
-    final DateTime now = DateTime.now();
-    final weekdays = [
-      'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
-    ];
-    final months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    String date = "${weekdays[now.weekday - 1]}, ${now.day} ${months[now.month - 1]}";
-
-    final List<Map<String, dynamic>> summaryCards = [
-      {'title': 'Active Projects', 'value': '0', 'icon': Icons.work_outline},
-      {'title': 'Employees', 'value': '0', 'icon': Icons.person_outline},
-      {'title': 'Candidates', 'value': '0', 'icon': Icons.people_alt_outlined},
-      {'title': 'Spent', 'value': r'0', 'icon': Icons.attach_money},
-    ];
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
@@ -57,18 +74,45 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-      body: FutureBuilder<DocumentSnapshot>(
-        future: FirebaseFirestore.instance.collection('users').doc(user!.uid).get(),
-        builder: (context, snapshot){
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: _fetchUserData(),
+        builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator(color: Colors.blue,));
           }
-          String username = snapshot.data!['username'] ?? 'User';
+
+          if (snapshot.hasError || !snapshot.hasData) {
+            return const Center(child: Text('Something went wrong.'));
+          }
+
+          final data = snapshot.data!;
+          final username = data['username'];
+          final activeProjectsValue = data['activeProjectsValue'];
+          final candidatesValue = data['candidatesValue'];
+
+          final List<Map<String, dynamic>> summaryCards = [
+            {'title': 'Active Projects', 'value': activeProjectsValue, 'icon': Icons.work_outline},
+            {'title': 'Employees', 'value': '0', 'icon': Icons.person_outline},
+            {'title': 'Candidates', 'value': candidatesValue, 'icon': Icons.people_alt_outlined},
+            {'title': 'Spent', 'value': '0', 'icon': Icons.attach_money},
+          ];
+
+          final DateTime now = DateTime.now();
+          final weekdays = [
+            'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
+          ];
+          final months = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+          ];
+          String date = "${weekdays[now.weekday - 1]}, ${now.day} ${months[now.month - 1]}";
+
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+                // Date + Greeting
                 SizedBox(
                   height: 80,
                   child: Card(
@@ -77,30 +121,18 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              date,
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey[400],
-                              ),
-                            ),
-                            Text(
-                              'Hi, $username',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
-                        )
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(date, style: TextStyle(fontSize: 14, color: Colors.grey[400])),
+                          Text('Hi, $username!', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-                // Summary Cards Grid
+
+                // Summary Cards
                 GridView.count(
                   crossAxisCount: 2,
                   shrinkWrap: true,
@@ -110,11 +142,11 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
                   childAspectRatio: 2,
                   children: summaryCards.map((card) {
                     return Container(
-                      padding: EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(12),
-                        boxShadow: [BoxShadow(color: Colors.grey, blurRadius: .5, blurStyle: BlurStyle.normal)],
+                        boxShadow: [BoxShadow(color: Colors.grey, blurRadius: .5)],
                       ),
                       child: Row(
                         children: [
@@ -134,6 +166,7 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
                   }).toList(),
                 ),
 
+                // Jobs Analytics chart
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -198,40 +231,62 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
                   ],
                 ),
 
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [
-                    Text('Recent Applicant', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                    Text('See All', style: TextStyle(color: Colors.blue)),
-                  ],
-                ),
-
+                // Applicants horizontal list
                 SizedBox(
                   height: 70,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    children: const [
-                      ApplicantCard(name: 'Sample 1', location: 'Sangandaan, Caloocan'),
-                      SizedBox(width: 10),
-                      ApplicantCard(name: 'Sample 2', location: 'Meycauayan, Bulacan'),
-                    ],
+                  child: FutureBuilder<QuerySnapshot>(
+                    future: FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(FirebaseAuth.instance.currentUser!.uid)
+                        .collection('candidates')
+                        .get(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator(color: Colors.blue,));
+                      }
+
+                      if (snapshot.hasError) {
+                        return const Center(child: Text('Error loading applicants'));
+                      }
+
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                        return const Center(child: Text('No applicants found'));
+                      }
+
+                      final applicants = snapshot.data!.docs;
+
+                      return ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: applicants.length,
+                        itemBuilder: (context, index) {
+                          final applicantData = applicants[index].data() as Map<String, dynamic>;
+                          final name = applicantData['applicantName'] ?? 'Unknown';
+                          final jobTitle = applicantData['jobTitle'] ?? 'Untitled';
+
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: ApplicantCard(name: name, jobTitle: jobTitle),
+                          );
+                        },
+                      );
+                    },
                   ),
                 ),
               ],
             ),
           );
         },
-
       ),
+
     );
   }
 }
 
 class ApplicantCard extends StatelessWidget {
   final String name;
-  final String location;
+  final String jobTitle;
 
-  const ApplicantCard({super.key, required this.name, required this.location});
+  const ApplicantCard({super.key, required this.name, required this.jobTitle});
 
   @override
   Widget build(BuildContext context) {
@@ -259,7 +314,7 @@ class ApplicantCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
-              Text(location, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+              Text(jobTitle, style: const TextStyle(fontSize: 12, color: Colors.black54)),
             ],
           ),
         ],
