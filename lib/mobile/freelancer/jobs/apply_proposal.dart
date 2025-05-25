@@ -105,14 +105,25 @@ class _ApplyProposalState extends State<ApplyProposal> {
 
     try {
       final uid = FirebaseAuth.instance.currentUser!.uid;
+
+      // Get job title
+      final jobDoc = await FirebaseFirestore.instance.collection('jobs').doc(widget.jobId).get();
+      final jobTitle = jobDoc['title'] ?? 'Untitled';
+
+      // Get applicant name
+      final userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      final applicantName = userDoc['username'] ?? 'Unnamed';
+
       final proposal = {
         'jobId': widget.jobId,
+        'jobTitle': jobTitle,
+        'applicantId': uid,
+        'applicantName': applicantName,
         'message': message,
         'rate': rate,
         'fileName': _fileName,
         'fileUrl': _fileUrl,
         'fileKey': _fileKey,
-        'userId': uid,
         'submittedAt': FieldValue.serverTimestamp(),
       };
 
@@ -139,6 +150,7 @@ class _ApplyProposalState extends State<ApplyProposal> {
       });
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
