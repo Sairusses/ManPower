@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:manpower/mobile/auth/auth_service.dart';
+import 'package:manpower/mobile/freelancer/profile/edit_name.dart';
+import 'package:manpower/mobile/freelancer/profile/edit_overview.dart';
 import 'package:manpower/mobile/freelancer/profile/pick_skills.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as sb;
 import 'dart:io' as io;
@@ -19,16 +21,13 @@ class Profile extends StatefulWidget {
   State<Profile> createState() => _ProfileState();
 }
 
-class _ProfileState extends State<Profile> with AutomaticKeepAliveClientMixin {
+class _ProfileState extends State<Profile> {
   final User? user = FirebaseAuth.instance.currentUser;
   bool isLoading = false;
 
-  @override
-  bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
@@ -54,7 +53,7 @@ class _ProfileState extends State<Profile> with AutomaticKeepAliveClientMixin {
 
           final String username = data['username'] ?? 'User';
           final String email = data['email'] ?? 'email';
-          final String overview = data['profile_overview'] ?? 'No overview provided.';
+          final String overview = data['overview'] ?? 'No overview provided.';
           final String resumeName = data['resume_name'] ?? '';
           final String resumeUrl = data['resume_url'] ?? '';
           final String fileKey = data['resume_fileKey'] ?? '';
@@ -127,8 +126,9 @@ class _ProfileState extends State<Profile> with AutomaticKeepAliveClientMixin {
               top: 0,
               right: 0,
               child: IconButton(
-                onPressed: (){
-                  // TODO Edit name and email
+                onPressed: () async {
+                  await Navigator.push(context, MaterialPageRoute(builder: (context) => EditName(name: name, email: email)));
+                  setState(() {});
                 },
                 icon: Icon(CupertinoIcons.pencil_circle, color: Colors.blue, size: 30),
               )
@@ -260,8 +260,9 @@ class _ProfileState extends State<Profile> with AutomaticKeepAliveClientMixin {
             right: 0,
             child: IconButton(
               icon: const Icon(CupertinoIcons.pencil_circle, size: 30, color: Colors.blue,),
-              onPressed: () {
-                // TODO Edit logic here
+              onPressed: () async {
+                await Navigator.push(context, MaterialPageRoute(builder: (context) => EditOverview(overview: overview,)));
+                setState(() {});
               },
             ),
           ),
@@ -296,12 +297,12 @@ class _ProfileState extends State<Profile> with AutomaticKeepAliveClientMixin {
             top: 0,
             right: 0,
             child: IconButton(
-              onPressed: (){
-                Navigator.push(
+              onPressed: () async {
+                await Navigator.push(
                   context, 
                   MaterialPageRoute(builder: (context) => PickSkills())
                 );
-                // TODO update main screen
+                setState(() {});
               }, 
               icon: Icon(CupertinoIcons.pencil_circle, color: Colors.blue, size: 30,)
             ),
