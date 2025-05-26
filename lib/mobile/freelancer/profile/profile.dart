@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:manpower/mobile/auth/auth_service.dart';
-import 'package:manpower/mobile/freelancer/profile/edit_name.dart';
+import 'package:manpower/mobile/components/edit_name.dart';
 import 'package:manpower/mobile/freelancer/profile/edit_overview.dart';
 import 'package:manpower/mobile/freelancer/profile/pick_skills.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as sb;

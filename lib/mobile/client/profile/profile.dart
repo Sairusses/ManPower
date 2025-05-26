@@ -3,6 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:manpower/mobile/auth/auth_service.dart';
+import 'package:manpower/mobile/components/edit_name.dart';
+
+import 'edit_details.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -37,7 +40,11 @@ class _ProfileState extends State<Profile>{
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator(color: Colors.blue,));
           }
-          String username = snapshot.data!['username'] ?? 'User';
+          final Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>? ?? {};
+          String username = snapshot.data?['username'] ?? 'User';
+          final String companyName = data.containsKey('company_name') ? data['company_name']?.toString() ?? 'Not set' : 'Not set';
+          final String location = data.containsKey('location') ? data['location']?.toString() ?? 'Not set' : 'Not set';
+
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -55,33 +62,29 @@ class _ProfileState extends State<Profile>{
                 _buildAccountCard(
                   name: username,
                   email: user!.email!,
-                  onEdit: () {
-                    // TODO: Handle edit button press
-                  },
                 ),
                 const SizedBox(height: 8),
-                _buildCompanyCard(),
+                _buildCompanyCard(
+                  companyName: companyName,
+                  location: location,
+                ),
                 const SizedBox(height: 8),
                 _buildPayments(),
                 const SizedBox(height: 8),
-                SizedBox(
-                  width: double.infinity,
-                  child: Expanded(
-                    child: ElevatedButton(
-                      onPressed: (){
-                        AuthService().logout(context);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
-                        elevation: 1,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        )
-                      ),
-                      child: Text('Log Out'),
-                    ),
+                ElevatedButton(
+                  onPressed: (){
+                    AuthService().logout(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(MediaQuery.of(context).size.width *.8, 40),
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                    elevation: 1,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    )
                   ),
+                  child: Text('Log Out'),
                 ),
 
               ],
@@ -96,56 +99,56 @@ class _ProfileState extends State<Profile>{
   Widget _buildAccountCard ({
     required String name,
     required String email,
-    required VoidCallback onEdit,
   }) {
-    return SizedBox(
-      width: double.infinity,
-      child: Expanded(
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(
-              color: Colors.grey,
-              width: .5,
-            ),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Stack(
-            children: [
-              Center(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text('Account', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 8),
-                    const CircleAvatar(
-                      radius: 20,
-                      backgroundColor: Colors.blue,
-                      child: Icon(Icons.person, color: Colors.white),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.normal)),
-                    Text(email, style: const TextStyle(fontSize: 14, color: Colors.grey)),
-                  ],
-                ),
-              ),
-              Positioned(
-                top: 0,
-                right: 0,
-                child: IconButton(
-                  icon: const Icon(CupertinoIcons.pencil_circle, color: Colors.blue, size: 30,),
-                  onPressed: onEdit
-                ),
-              )
-            ],
-          ),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(
+          color: Colors.grey,
+          width: .5,
         ),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Stack(
+        children: [
+          Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text('Account', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                const CircleAvatar(
+                  radius: 20,
+                  backgroundColor: Colors.blue,
+                  child: Icon(Icons.person, color: Colors.white),
+                ),
+                const SizedBox(height: 16),
+                Text(name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.normal)),
+                Text(email, style: const TextStyle(fontSize: 14, color: Colors.grey)),
+              ],
+            ),
+          ),
+          Positioned(
+            top: 0,
+            right: 0,
+            child: IconButton(
+              icon: const Icon(CupertinoIcons.pencil_circle, color: Colors.blue, size: 30,),
+              onPressed: () async {
+                await Navigator.push(context, MaterialPageRoute(builder: (context) => EditName(name: name, email: email)));
+                setState(() {});
+              }
+            ),
+          )
+        ],
       ),
     );
   }
 
-  Widget _buildCompanyCard() {
+  Widget _buildCompanyCard({
+    required String companyName,
+    required String location,
+  }) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -158,22 +161,25 @@ class _ProfileState extends State<Profile>{
         children: [
           Center(
             child: Column(
-              children: const [
+              children: [
                 Text('Company', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 SizedBox(height: 12),
                 Icon(Icons.business, size: 40, color: Colors.blue),
                 SizedBox(height: 12),
-                Text('Company Name: Not set'),
-                Text('Location: Not set'),
+                Text('Company Name: $companyName'),
+                Text('Location: $location'),
               ],
             ),
           ),
-          const Positioned(
+          Positioned(
             top: 0,
             right: 0,
             child: IconButton(
-              icon: Icon(CupertinoIcons.pencil_circle, color: Colors.blue, size: 30),
-              onPressed: null, // TODO: Implement editing
+              icon: const Icon(CupertinoIcons.pencil_circle, color: Colors.blue, size: 30),
+              onPressed: () async{
+                await Navigator.push(context, MaterialPageRoute(builder: (context) => EditDetails(companyName: companyName, location: location)));
+                setState(() {});
+              },
             ),
           ),
         ],

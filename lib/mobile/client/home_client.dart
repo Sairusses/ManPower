@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../components/messages.dart';
 import 'dashboard.dart';
 import 'talents.dart';
-import 'profile.dart';
+import 'profile/profile.dart';
 import 'package:manpower/mobile/client/projects/projects.dart';
 
 class HomeClient extends StatefulWidget {
