@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:manpower/mobile/auth/auth_service.dart';
 import 'package:manpower/mobile/auth/log_in.dart';
@@ -21,15 +20,6 @@ class _CreateAccountState extends State<CreateAccount> {
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
   bool isLoading = false;
-
-  void saveUserFcmToken(String uid) async {
-    final fcmToken = await FirebaseMessaging.instance.getToken();
-    if (fcmToken != null) {
-      await FirebaseFirestore.instance.collection('users').doc(uid).update({
-        'fcmToken': fcmToken,
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -105,7 +95,6 @@ class _CreateAccountState extends State<CreateAccount> {
                   setState(() => isLoading = false);
 
                   if (userId != null && context.mounted) {
-                    saveUserFcmToken(userId);
                     if (widget.role == 'client') {
                       Navigator.of(context).pushAndRemoveUntil(
                         MaterialPageRoute(builder: (context) => HomeClient()),

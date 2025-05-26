@@ -11,16 +11,12 @@ class Profile extends StatefulWidget {
   State<Profile> createState() => _ProfileState();
 }
 
-class _ProfileState extends State<Profile> with AutomaticKeepAliveClientMixin{
+class _ProfileState extends State<Profile>{
   final User? user = FirebaseAuth.instance.currentUser;
   bool isLoading = false;
 
   @override
-  bool get wantKeepAlive => true;
-
-  @override
   Widget build(BuildContext context) {
-    super.build(context);
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
