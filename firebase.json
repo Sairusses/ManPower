@@ -1,0 +1,39 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "manpower-fa519",
+          "appId": "1:893964794004:android:48e398144bf9dfdafddc81",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "manpower-fa519",
+          "configurations": {
+            "android": "1:893964794004:android:48e398144bf9dfdafddc81",
+            "ios": "1:893964794004:ios:9dda9626b059be05fddc81",
+            "web": "1:893964794004:web:87ee344d57ebf810fddc81"
+          }
+        }
+      }
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run lint"
+      ]
+    }
+  ]
+}
