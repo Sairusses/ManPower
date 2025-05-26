@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 // Pages
-import '../components/messages.dart';
+import '../components/user_list.dart';
 import 'jobs/jobs.dart';
 import 'contracts.dart';
 import 'profile/profile.dart';
@@ -94,7 +94,7 @@ class HomeFreelancerState extends State<HomeFreelancer> {
           Jobs(),
           Proposals(),
           Contracts(),
-          Messages(),
+          UserList(),
           Profile(),
         ],
       ),

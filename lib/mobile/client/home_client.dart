@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 //Pages
-import '../components/messages.dart';
+import '../components/user_list.dart';
 import 'dashboard.dart';
 import 'talents.dart';
 import 'profile/profile.dart';
@@ -67,7 +67,7 @@ class HomeClientState extends State<HomeClient> {
           NavigationDestination(
             selectedIcon: Icon(Icons.business_center, color: Colors.blue),
             icon: Icon(Icons.business_center_outlined),
-            label: 'Projects',
+            label: 'Principals',
           ),
           NavigationDestination(
             selectedIcon: Icon(CupertinoIcons.search_circle_fill, color: Colors.blue),
@@ -94,7 +94,7 @@ class HomeClientState extends State<HomeClient> {
           Dashboard(),
           Projects(),
           Talents(),
-          Messages(),
+          UserList(),
           Profile(),
         ],
       ),
